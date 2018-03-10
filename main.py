@@ -15,6 +15,7 @@ class Main:
         pygame.display.set_caption("IA")
         self.flor = pygame.image.load("images/flor.png")
         self.mario = pygame.image.load("images/mario.png")
+        self.mario_flor = pygame.image.load("images/mario_flor.png")
         self.bloque = pygame.image.load("images/bloque.png")
         self.tortuga = pygame.image.load("images/tortuga.png")
         self.princesa = pygame.image.load("images/peach.png")
@@ -109,7 +110,10 @@ class Main:
                     elif val == 4:
                         self.frame.blit(self.tortuga, (50 * j, 50 * i))
             self.frame.blit(self.princesa, (50*self.princess_position[1], 50*self.princess_position[0]))
-            self.frame.blit(self.mario, (50 * nodes[0].position[1], 50 * nodes[0].position[0]))
+            if nodes[0].flor:
+                self.frame.blit(self.mario_flor, (50 * nodes[0].position[1], 50 * nodes[0].position[0]))
+            else:
+                self.frame.blit(self.mario, (50 * nodes[0].position[1], 50 * nodes[0].position[0]))
             pygame.display.update()
             pygame.time.delay(1500)
             nodes.pop(0)
