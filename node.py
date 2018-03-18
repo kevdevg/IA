@@ -49,7 +49,7 @@ class Node:
         node.father = self
         return node
 
-    def make_child_node_with_weight(self, direction, world):
+    def make_child_node_with_weight(self, direction, world, princess):
         if direction == 'up':
             node = Node((self.position[0]-1, self.position[1]), self)
         elif direction == 'down':
@@ -68,7 +68,10 @@ class Node:
             peso = 1
         else:
             peso = 1
+
         node.weight = peso + node.father.weight
+        node.heuristic_function(princess)
+
         return node
 
     def get_fathers(self):
@@ -79,3 +82,8 @@ class Node:
             fathers.insert(0, actual_node.father)
             actual_node = actual_node.father
         return fathers
+
+    def heuristic_function(self, princess):
+        if princess:
+            self.heuristic = abs(princess[0]-self.position[0]) + abs(princess[1]-self.position[1])
+            self.weight_and_heuristic = self.weight + self.heuristic

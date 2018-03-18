@@ -38,15 +38,15 @@ class Main:
                     quit()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == 97:
-                        self.profundidad()
+                        self.amplitud()
                     elif event.key == 115:
                         self.costos()
                     elif event.key == 100:
-                        self.show_route()
+                        self.profundidad()
                     elif event.key == 102:
-                        self.show_route()
+                        self.avaro()
                     elif event.key == 103:
-                        self.show_route()
+                        self.estrella()
 
             self.frame.fill((255, 255, 255))
             pygame.display.update()
@@ -63,6 +63,36 @@ class Main:
         nodes = []
         initial_node = Node(self.mario_position, None)
         nodes.append(initial_node)
+        counter = 0
+        while not nodes[0].check_is_goal(self.data):
+        # for i in range(150):
+            actual_node = nodes[0]
+            nodes.pop(0)
+            # con esta organización el algoritmo muere
+            # if (actual_node.can_move(self.data, 'right')):
+            #     nodes.insert(0, actual_node.make_child_node('right'))
+            # if(actual_node.can_move(self.data, 'up')):
+            #     nodes.insert(0, actual_node.make_child_node('up'))
+            # if (actual_node.can_move(self.data, 'left')):
+            #     nodes.insert(0, actual_node.make_child_node('left'))
+            # if (actual_node.can_move(self.data, 'down')):
+            #     nodes.insert(0, actual_node.make_child_node('down'))
+            if (actual_node.can_move(self.data, 'up')):
+                nodes.insert(0, actual_node.make_child_node('up'))
+            if (actual_node.can_move(self.data, 'right')):
+                nodes.insert(0, actual_node.make_child_node('right'))
+            if (actual_node.can_move(self.data, 'down')):
+                nodes.insert(0, actual_node.make_child_node('down'))
+            if (actual_node.can_move(self.data, 'left')):
+                nodes.insert(0, actual_node.make_child_node('left'))
+        self.show_route(nodes[0].get_fathers(), counter)
+
+    def amplitud(self):
+        print("entra")
+        nodes = []
+        initial_node = Node(self.mario_position, None)
+        nodes.append(initial_node)
+        counter = 0
         while not nodes[0].check_is_goal(self.data):
             if (nodes[0].can_move(self.data, 'right')):
                 nodes.append(nodes[0].make_child_node('right'))
@@ -73,27 +103,70 @@ class Main:
             if (nodes[0].can_move(self.data, 'down')):
                 nodes.append(nodes[0].make_child_node('down'))
             nodes.pop(0)
-        self.show_route(nodes[0].get_fathers())
+            counter += 1
+        self.show_route(nodes[0].get_fathers(), counter)
 
     def costos(self):
         nodes = []
         initial_node = Node(self.mario_position, None)
         nodes.append(initial_node)
+        counter = 0
         while not nodes[0].check_is_goal(self.data):
             if (nodes[0].can_move(self.data, 'right')):
-                nodes.append(nodes[0].make_child_node_with_weight('right', self.data))
+                nodes.append(nodes[0].make_child_node_with_weight('right', self.data, False))
             if(nodes[0].can_move(self.data, 'up')):
-                nodes.append(nodes[0].make_child_node_with_weight('up', self.data))
+                nodes.append(nodes[0].make_child_node_with_weight('up', self.data, False))
             if (nodes[0].can_move(self.data, 'left')):
-                nodes.append(nodes[0].make_child_node_with_weight('left', self.data))
+                nodes.append(nodes[0].make_child_node_with_weight('left', self.data, False))
             if (nodes[0].can_move(self.data, 'down')):
-                nodes.append(nodes[0].make_child_node_with_weight('down', self.data))
+                nodes.append(nodes[0].make_child_node_with_weight('down', self.data, False))
             nodes.pop(0)
             nodes.sort(key=lambda x: x.weight)
-        self.show_route(nodes[0].get_fathers())
+            counter += 1
+        self.show_route(nodes[0].get_fathers(), counter)
 
-    def show_route(self, nodes):
-        print([n.weight for n in nodes])
+    def avaro(self):
+        print("avaro")
+        nodes = []
+        initial_node = Node(self.mario_position, None)
+        nodes.append(initial_node)
+        counter = 0
+        while not nodes[0].check_is_goal(self.data):
+            if (nodes[0].can_move(self.data, 'right')):
+                nodes.append(nodes[0].make_child_node_with_weight('right', self.data, self.princess_position))
+            if(nodes[0].can_move(self.data, 'up')):
+                nodes.append(nodes[0].make_child_node_with_weight('up', self.data, self.princess_position))
+            if (nodes[0].can_move(self.data, 'left')):
+                nodes.append(nodes[0].make_child_node_with_weight('left', self.data, self.princess_position))
+            if (nodes[0].can_move(self.data, 'down')):
+                nodes.append(nodes[0].make_child_node_with_weight('down', self.data, self.princess_position))
+            nodes.pop(0)
+            nodes.sort(key=lambda x: x.heuristic)
+            counter += 1
+        self.show_route(nodes[0].get_fathers(), counter)
+
+    def estrella(self):
+        print("estrella")
+        nodes = []
+        initial_node = Node(self.mario_position, None)
+        nodes.append(initial_node)
+        counter = 0
+        while not nodes[0].check_is_goal(self.data):
+            if (nodes[0].can_move(self.data, 'right')):
+                nodes.append(nodes[0].make_child_node_with_weight('right', self.data, self.princess_position))
+            if(nodes[0].can_move(self.data, 'up')):
+                nodes.append(nodes[0].make_child_node_with_weight('up', self.data, self.princess_position))
+            if (nodes[0].can_move(self.data, 'left')):
+                nodes.append(nodes[0].make_child_node_with_weight('left', self.data, self.princess_position))
+            if (nodes[0].can_move(self.data, 'down')):
+                nodes.append(nodes[0].make_child_node_with_weight('down', self.data, self.princess_position))
+            nodes.pop(0)
+            nodes.sort(key=lambda x: x.weight_and_heuristic)
+            counter += 1
+        self.show_route(nodes[0].get_fathers(), counter)
+
+    def show_route(self, nodes, counter):
+        print(counter)
         while True:
             self.frame.fill((255, 255, 255))
             for event in pygame.event.get():
