@@ -71,7 +71,7 @@ class Node:
 
         node.weight = peso + node.father.weight
         node.heuristic_function(princess)
-
+                
         return node
 
     def get_fathers(self):
