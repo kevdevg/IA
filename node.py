@@ -17,23 +17,55 @@ class Node:
 
     def can_move(self, world, direction):
         if direction == 'up':
-            if self.father and (self.position[0]-1, self.position[1]) == self.father.position:
+            if self.father and self.father.check_is_equal(self.position[0]-1, self.position[1], world):
                 return False
             return self.position[0] != 0 and world[self.position[0]-1][self.position[1]] != 1
         elif direction == 'down':
-            if self.father and (self.position[0]+1, self.position[1]) == self.father.position:
+            if self.father and self.father.check_is_equal(self.position[0]+1, self.position[1], world):
                 return False
             return self.position[0] != 9 and world[self.position[0]+1][self.position[1]] != 1
         elif direction == 'left':
-            if self.father and (self.position[0], self.position[1]-1) == self.father.position:
+            if self.father and self.father.check_is_equal(self.position[0], self.position[1]-1, world):
                 return False
             return self.position[1] != 0 and world[self.position[0]][self.position[1]-1] != 1
         elif direction == 'right':
-            if self.father and (self.position[0], self.position[1]+1) == self.father.position:
+            if self.father and self.father.check_is_equal(self.position[0], self.position[1]+1, world):
                 return False
             return self.position[1] != 9 and world[self.position[0]][self.position[1]+1] != 1
         else:
             raise AttributeError
+
+    def can_move_check_fathers(self, world, direction):
+        if direction == 'up':
+            if self.father and self.father.check_is_equal_or_is_father(self.position[0] - 1, self.position[1], world):
+                return False
+            return self.position[0] != 0 and world[self.position[0] - 1][self.position[1]] != 1
+        elif direction == 'down':
+            if self.father and self.father.check_is_equal_or_is_father(self.position[0] + 1, self.position[1], world):
+                return False
+            return self.position[0] != 9 and world[self.position[0] + 1][self.position[1]] != 1
+        elif direction == 'left':
+            if self.father and self.father.check_is_equal_or_is_father(self.position[0], self.position[1] - 1, world):
+                return False
+            return self.position[1] != 0 and world[self.position[0]][self.position[1] - 1] != 1
+        elif direction == 'right':
+            if self.father and self.father.check_is_equal_or_is_father(self.position[0], self.position[1] + 1, world):
+                return False
+            return self.position[1] != 9 and world[self.position[0]][self.position[1] + 1] != 1
+        else:
+            raise AttributeError
+
+    def check_is_equal(self, x, y, world):
+        return ((x, y) == self.position and self.flor == (world[x][y] == 3))
+
+    def check_is_equal_or_is_father(self, x, y, world):
+        if (x, y) == self.position and self.flor == (world[x][y] == 3):
+            return True
+        else:
+            for i in self.get_fathers():
+                if (x, y) == i.position and i.flor == (world[x][y] == 3):
+                    return True
+            return False
 
     def make_child_node(self, direction):
         if direction == 'up':

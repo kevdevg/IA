@@ -112,26 +112,17 @@ class Main:
         nodes.append(initial_node)
         counter = 0
         while not nodes[0].check_is_goal(self.data):
-        # for i in range(150):
+
             actual_node = nodes[0]
             nodes.pop(0)
-            # con esta organización el algoritmo muere
-            # if (actual_node.can_move(self.data, 'right')):
-            #     nodes.insert(0, actual_node.make_child_node('right'))
-            # if(actual_node.can_move(self.data, 'up')):
-            #     nodes.insert(0, actual_node.make_child_node('up'))
-            # if (actual_node.can_move(self.data, 'left')):
-            #     nodes.insert(0, actual_node.make_child_node('left'))
-            # if (actual_node.can_move(self.data, 'down')):
-            #     nodes.insert(0, actual_node.make_child_node('down'))
-            if (actual_node.can_move(self.data, 'up')):
-                nodes.insert(0, actual_node.make_child_node('up'))
-            if (actual_node.can_move(self.data, 'right')):
+            if (actual_node.can_move_check_fathers(self.data, 'right')):
                 nodes.insert(0, actual_node.make_child_node('right'))
-            if (actual_node.can_move(self.data, 'down')):
-                nodes.insert(0, actual_node.make_child_node('down'))
-            if (actual_node.can_move(self.data, 'left')):
+            if(actual_node.can_move_check_fathers(self.data, 'up')):
+                nodes.insert(0, actual_node.make_child_node('up'))
+            if (actual_node.can_move_check_fathers(self.data, 'left')):
                 nodes.insert(0, actual_node.make_child_node('left'))
+            if (actual_node.can_move_check_fathers(self.data, 'down')):
+                nodes.insert(0, actual_node.make_child_node('down'))
             counter += 1
         algorithm_data = {
             'name': "Profundidad evitando ciclos",
