@@ -1,121 +1,65 @@
+import sys
+
+
 class Node:
 
-    def __str__(self):
-        return "{0},{1}".format(self.x, self.y)
-
-    def __init__(self, position, father):
+    def __init__(self, position, adversary, father, state, type, max_points, min_points):
         self.position = position
+        self.adversary = adversary
         self.father = father
-        self.weight = 0
-        if father and father.flor:
-            self.flor = True
+        self.state = state
+        self.type = type
+        if not self.type:
+            self.value = sys.maxsize
         else:
-            self.flor = False
+            self.value = -sys.maxsize
+        self.is_expand = False
+        self.move = None
+        self.best_move = None
+        self.max_points = max_points
+        self.min_points = min_points
 
-    def check_is_goal(self, world):
-        return world[self.position[0]][self.position[1]] == 5
+    def play(self):
+        construction = True
+        tree = [self]
+        best_move = None
+        best_score = 0
+        final_tree = []
+        while construction:
+            if tree[0].is_expand:
+                final_tree.insert(0, tree[0])
+                tree.remove(tree[0])
+                if not len(tree):
+                    construction = False
+            else:
+                if(tree[0].position in tree[0].state):
+                    tree[0].state.remove(tree[0].position)
+                    if(tree[0].type):
+                        tree[0].max_points += 1
+                    else:
+                        tree[0].min_points += 1
+                tree[0].is_expand = True
+                if(len(tree[0].state)):
+                    for node in tree[0].get_moves():
+                        tree.insert(0, Node(tree[0].adversary, node, tree[0], tree[0].state, not tree[0].type))
+        print(len(final_tree))
 
-    def can_move(self, world, direction):
-        if direction == 'up':
-            if self.father and self.father.check_is_equal(self.position[0]-1, self.position[1], world):
-                return False
-            return self.position[0] != 0 and world[self.position[0]-1][self.position[1]] != 1
-        elif direction == 'down':
-            if self.father and self.father.check_is_equal(self.position[0]+1, self.position[1], world):
-                return False
-            return self.position[0] != 9 and world[self.position[0]+1][self.position[1]] != 1
-        elif direction == 'left':
-            if self.father and self.father.check_is_equal(self.position[0], self.position[1]-1, world):
-                return False
-            return self.position[1] != 0 and world[self.position[0]][self.position[1]-1] != 1
-        elif direction == 'right':
-            if self.father and self.father.check_is_equal(self.position[0], self.position[1]+1, world):
-                return False
-            return self.position[1] != 9 and world[self.position[0]][self.position[1]+1] != 1
-        else:
-            raise AttributeError
-
-    def can_move_check_fathers(self, world, direction):
-        if direction == 'up':
-            if self.father and self.father.check_is_equal_or_is_father(self.position[0] - 1, self.position[1], world):
-                return False
-            return self.position[0] != 0 and world[self.position[0] - 1][self.position[1]] != 1
-        elif direction == 'down':
-            if self.father and self.father.check_is_equal_or_is_father(self.position[0] + 1, self.position[1], world):
-                return False
-            return self.position[0] != 9 and world[self.position[0] + 1][self.position[1]] != 1
-        elif direction == 'left':
-            if self.father and self.father.check_is_equal_or_is_father(self.position[0], self.position[1] - 1, world):
-                return False
-            return self.position[1] != 0 and world[self.position[0]][self.position[1] - 1] != 1
-        elif direction == 'right':
-            if self.father and self.father.check_is_equal_or_is_father(self.position[0], self.position[1] + 1, world):
-                return False
-            return self.position[1] != 9 and world[self.position[0]][self.position[1] + 1] != 1
-        else:
-            raise AttributeError
-
-    def check_is_equal(self, x, y, world):
-        return ((x, y) == self.position and self.flor == (world[x][y] == 3))
-
-    def check_is_equal_or_is_father(self, x, y, world):
-        if (x, y) == self.position and self.flor == (world[x][y] == 3):
-            return True
-        else:
-            for i in self.get_fathers():
-                if (x, y) == i.position and i.flor == (world[x][y] == 3):
-                    return True
-            return False
-
-    def make_child_node(self, direction):
-        if direction == 'up':
-            node = Node((self.position[0]-1, self.position[1]), self)
-        elif direction == 'down':
-            node = Node((self.position[0] + 1, self.position[1]), self)
-        elif direction == 'left':
-            node = Node((self.position[0], self.position[1]-1), self)
-        elif direction == 'right':
-            node = Node((self.position[0], self.position[1]+1), self)
-        else:
-            raise AttributeError
-        node.father = self
-        return node
-
-    def make_child_node_with_weight(self, direction, world, princess):
-        if direction == 'up':
-            node = Node((self.position[0]-1, self.position[1]), self)
-        elif direction == 'down':
-            node = Node((self.position[0] + 1, self.position[1]), self)
-        elif direction == 'left':
-            node = Node((self.position[0], self.position[1]-1), self)
-        elif direction == 'right':
-            node = Node((self.position[0], self.position[1]+1), self)
-        else:
-            raise AttributeError
-
-        if world[node.position[0]][node.position[1]] == 4 and not node.flor:
-            peso = 7
-        elif world[node.position[0]][node.position[1]] == 3:
-            node.flor = True
-            peso = 1
-        else:
-            peso = 1
-
-        node.weight = peso + node.father.weight
-        node.heuristic_function(princess)
-                
-        return node
-
-    def get_fathers(self):
-        fathers = []
-        actual_node = self
-        fathers.insert(0, actual_node)
-        while actual_node.father:
-            fathers.insert(0, actual_node.father)
-            actual_node = actual_node.father
-        return fathers
-
-    def heuristic_function(self, princess):
-        if princess:
-            self.heuristic = abs(princess[0]-self.position[0]) + abs(princess[1]-self.position[1])
-            self.weight_and_heuristic = self.weight + self.heuristic
+    def get_moves(self):
+        moves = []
+        moves.append((self.position[0] - 2, self.position[1] - 1))
+        moves.append((self.position[0] - 2, self.position[1] + 1))
+        moves.append((self.position[0] + 2, self.position[1] - 1))
+        moves.append((self.position[0] + 2, self.position[1] + 1))
+        moves.append((self.position[0] - 1, self.position[1] - 2))
+        moves.append((self.position[0] + 1, self.position[1] - 2))
+        moves.append((self.position[0] - 1, self.position[1] + 2))
+        moves.append((self.position[0] + 1, self.position[1] + 2))
+        true_moves = []
+        for move in moves:
+            if (move[0] >= 0 and move[0] <= 5 and move[1] >= 0 and move[1] <= 5):
+                true_moves.append(move)
+        if self.adversary in moves:
+            true_moves.remove(self.adversary)
+        if self.father and self.father.position in moves:
+            true_moves.remove(self.father.position)
+        return true_moves
